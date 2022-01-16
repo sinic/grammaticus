@@ -12,7 +12,7 @@ yields the following in the echo area:
 *ărās*: verb, 2nd person singular present indicative active (aro) \\
 ārās: noun, plural female accusative (ara)
 #+END_QUOTE
-old words are considered exact matches, but
+Bold words are considered exact matches, but
 near matches with different vowel lengths are also shown.
 
 ** Usage
