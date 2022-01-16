@@ -1,0 +1,36 @@
+#+STARTUP: showall
+* Grammaticus
+
+This Emacs package helps with composing text in the Latin language
+by displaying information from the built-in database of the excellent
+[[https://github.com/Alatius/latin-macronizer/][latin-macronizer]]
+by Johan Winge.
+
+Looking up information about the word 'arās', for example,
+yields the following in the echo area:
+#+BEGIN_QUOTE
+*ărās*: verb, 2nd person singular present indicative active (aro) \\
+ārās: noun, plural female accusative (ara)
+#+END_QUOTE
+old words are considered exact matches, but
+near matches with different vowel lengths are also shown.
+
+** Usage
+
+First execute the ~package-install-file~ command and
+point it to a local copy of ~grammaticus.el~ from this repository,
+then ~grammaticus-add-words~ and
+point it to a copy of ~macrons.txt~, which you can download at
+https://raw.githubusercontent.com/Alatius/latin-macronizer/master/macrons.txt.
+
+There are two ways to use this package:
+Either explicitly look up words with ~grammaticus-lookup~,
+or simply active ~grammaticus-mode~,
+which automatically looks up the word at point.
+
+Note that if you want to
+explicitly look up words at point by pressing a key,
+you have to wrap ~grammaticus-lookup~ like this:
+#+BEGIN_SRC emacs-lisp
+(bind-key [f9] (lambda () (interactive) (grammaticus-lookup)))
+#+END_SRC
