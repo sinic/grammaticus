@@ -25,7 +25,7 @@ https://raw.githubusercontent.com/Alatius/latin-macronizer/master/macrons.txt.
 
 There are two ways to use this package:
 Either explicitly look up words with ~grammaticus-lookup~,
-or simply active ~grammaticus-mode~,
+or simply activate ~grammaticus-mode~,
 which automatically looks up the word at point.
 
 Note that if you want to
