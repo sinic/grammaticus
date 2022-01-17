@@ -70,7 +70,7 @@
           (gethash (grammaticus--to-ASCII word) grammaticus--index)))
 
 (defun grammaticus--at (exact marks index)
-  "Return grammatical information at INDEX, with EXACT highlighted.
+  "Return string with information at INDEX, with EXACT highlighted.
 
 Ignore case and diacritics when determining matches, except for MARKS."
   (with-current-buffer grammaticus--buffer
