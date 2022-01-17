@@ -41,11 +41,11 @@
 (defun grammaticus-lookup (&optional word)
   "Look up grammatical information to a WORD and display it."
   (interactive (list (read-string "Look up word: " (current-word))))
-  (let ((key (ucs-normalize-NFKD-string (downcase (or word (current-word) ""))))
-        (message-log-max nil))
-    (if-let* ((value (gethash (grammaticus--to-ASCII key) grammaticus--index)))
-        (message "%s" (mapconcat (apply-partially #'grammaticus--at key '(772))
-                                 value "\n")))))
+  (setq word (ucs-normalize-NFKD-string (downcase (or word (current-word) ""))))
+  (let ((all (list (replace-regexp-in-string "\\(qu\\|[nv]\\)e\\'" "" word)))
+        (message-log-max))
+    (unless (string= (car all) word) (push word all))  ; with -que/-ne/-ve
+    (message "%s" (string-join (mapcan #'grammaticus--get all) "\n"))))
 
 ;;;###autoload
 (defun grammaticus-add-words (path)
@@ -63,6 +63,11 @@
                             (push (point) (gethash key grammaticus--index)))
                           (forward-line))))
   (message "Database now has %d words" (hash-table-size grammaticus--index)))
+
+(defun grammaticus--get (word)
+  "Return list of strings with information pertaining to WORD."
+  (mapcar (apply-partially #'grammaticus--at word '(772))
+          (gethash (grammaticus--to-ASCII word) grammaticus--index)))
 
 (defun grammaticus--at (exact marks index)
   "Return grammatical information at INDEX, with EXACT highlighted.
