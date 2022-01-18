@@ -31,6 +31,11 @@
 (defvar grammaticus--index (make-hash-table :test #'equal :size 282939)
   "Hash table that will map from words to file positions.")
 
+(defcustom grammaticus-use-J t "If non-nil, use letter J for consonantal Is."
+  :type 'boolean)
+(defcustom grammaticus-use-V t "If non-nil, use letter V for consonantal Us."
+  :type 'boolean)
+
 (define-minor-mode grammaticus-mode
   "Automatically look up information for the Latin word at point."
   :lighter " Grammaticus"
@@ -114,7 +119,9 @@ Ignore case and diacritics when determining matches, except for MARKS."
 
 (defun grammaticus--to-UCS (string)
   "Replace ASCII punctuation in STRING by UCS diacritics."
-  (dolist (pair '((?_ . 772) (?^ . 774) (?+ . 776)))
+  (dolist (pair `((?_ . 772) (?^ . 774) (?+ . 776)
+                  ,@(unless grammaticus-use-J '((?J . ?I) (?j . ?i)))
+                  ,@(unless grammaticus-use-V '((?V . ?u) (?v . ?u)))))
     (subst-char-in-string (car pair) (cdr pair) string t))
   (let ((hidden (string 772 774)))  ; hidden quantity (_^)
     (ucs-normalize-NFKD-string (replace-regexp-in-string hidden "" string))))
