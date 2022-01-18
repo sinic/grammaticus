@@ -77,9 +77,9 @@ Ignore case and diacritics when determining matches, except for MARKS."
     (goto-char index)
     (let* ((tag (grammaticus--interpret-tag (grammaticus--next-field)))
            (lemma (grammaticus--next-field))
-           (full (grammaticus--to-UCS (grammaticus--next-field)))
-           (hit (string= exact (downcase (grammaticus--to-ASCII full marks)))))
-      (format "%s:%s (%s)" (propertize full 'face (if hit 'bold)) tag lemma))))
+           (canon (grammaticus--to-UCS (grammaticus--next-field)))
+           (hit (string= exact (downcase (grammaticus--to-ASCII canon marks)))))
+      (format "%s:%s (%s)" (propertize canon 'face (if hit 'bold)) tag lemma))))
 
 (defun grammaticus--next-field ()
   "Return the field at point and proceed to the next."
