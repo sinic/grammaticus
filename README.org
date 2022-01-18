@@ -6,7 +6,7 @@ by displaying information from the built-in database of the excellent
 [[https://github.com/Alatius/latin-macronizer/][latin-macronizer]]
 by Johan Winge.
 
-Looking up information about the word 'arās', for example,
+Looking up information about the word '/arās/', for example,
 yields the following in the echo area:
 #+BEGIN_QUOTE
 *ărās*: verb, 2nd person singular present indicative active (aro) \\
@@ -36,4 +36,4 @@ you have to wrap ~grammaticus-lookup~ like this:
 #+END_SRC
 
 You can customize ~grammaticus-use-J~ and ~grammaticus-use-V~
-if you prefer, say, 'adiuuat' over 'adjuvat'.
+if you prefer, say, '/adiuuat/' over '/adjuvat/'.
