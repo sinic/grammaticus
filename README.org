@@ -34,3 +34,6 @@ you have to wrap ~grammaticus-lookup~ like this:
 #+BEGIN_SRC emacs-lisp
 (bind-key [f9] (lambda () (interactive) (grammaticus-lookup)))
 #+END_SRC
+
+You can customize ~grammaticus-use-J~ and ~grammaticus-use-V~
+if you prefer, say, 'adiuuat' over 'adjuvat'.
