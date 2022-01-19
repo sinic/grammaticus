@@ -48,7 +48,7 @@
   (interactive (list (read-string "Look up word: " (current-word))))
   (setq word (ucs-normalize-NFKD-string (downcase (or word (current-word) ""))))
   (let ((all (list (replace-regexp-in-string "\\(qu\\|[nuv]\\)e\\'" "" word)))
-        (message-log-max))
+        message-log-max)
     (unless (string= (car all) word) (push word all))  ; with -que/-ne/-ve
     (message "%s" (string-join (mapcan #'grammaticus--get all) "\n"))))
 
