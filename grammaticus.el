@@ -43,6 +43,18 @@
       (add-hook 'post-command-hook #'grammaticus-lookup t t)
     (remove-hook 'post-command-hook #'grammaticus-lookup t)))
 
+(defun grammaticus--check ()
+  "Check word at point and underline it if it's unknown."
+  (let ((result (grammaticus--get (thing-at-point 'word t))))
+    (when-let* ((bounds (bounds-of-thing-at-point 'word)))
+      (remove-overlays (car bounds) (cdr bounds) 'grammaticus-overlay t)
+      (unless (seq-some #'car result)
+        (let ((overlay (make-overlay (car bounds) (cdr bounds) nil t))
+              (color (if result "DarkOrange" "Red1")))  ; like in Flyspell
+          (overlay-put overlay 'face `(:underline (:style wave :color ,color)))
+          (overlay-put overlay 'grammaticus-overlay t)))
+      (grammaticus--show result))))
+
 (defun grammaticus-lookup (&optional word)
   "Look up grammatical information to a WORD and display it."
   (interactive (list (read-string "Look up word: " (current-word))))
