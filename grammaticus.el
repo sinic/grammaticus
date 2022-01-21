@@ -46,11 +46,7 @@
 (defun grammaticus-lookup (&optional word)
   "Look up grammatical information to a WORD and display it."
   (interactive (list (read-string "Look up word: " (current-word))))
-  (setq word (ucs-normalize-NFKD-string (downcase (or word (current-word) ""))))
-  (let ((all (list (replace-regexp-in-string "\\(qu\\|[nuv]\\)e\\'" "" word)))
-        message-log-max)
-    (unless (string= (car all) word) (push word all))  ; with -que/-ne/-ve
-    (message "%s" (string-join (mapcan #'grammaticus--get all) "\n"))))
+  (grammaticus--show (grammaticus--get (or word (current-word)))))
 
 ;;;###autoload
 (defun grammaticus-add-words (path)
@@ -70,12 +66,21 @@
   (message "Database now has %d words" (hash-table-size grammaticus--index)))
 
 (defun grammaticus--get (word)
-  "Return list of strings with information pertaining to WORD."
-  (mapcar (apply-partially #'grammaticus--at word '(772))
-          (gethash (grammaticus--to-ASCII word) grammaticus--index)))
+  "Return list of pairs with information pertaining to WORD."
+  (setq word (ucs-normalize-NFKD-string (downcase (or word ""))))
+  (let ((all (list (replace-regexp-in-string "\\(qu\\|[nuv]\\)e\\'" "" word))))
+    (unless (string= (car all) word) (push word all))  ; with -que/-ne/-ve
+    (mapcan (lambda (s)
+              (mapcar (apply-partially #'grammaticus--at s '(772))
+                      (gethash (grammaticus--to-ASCII s) grammaticus--index)))
+            all)))
+
+(defun grammaticus--show (result)
+  "Display the list of pairs returned from grammaticus--get."
+  (let ((message-log-max)) (message "%s" (mapconcat #'cdr result "\n"))))
 
 (defun grammaticus--at (exact marks index)
-  "Return string with information at INDEX, with EXACT highlighted.
+  "Return pair with information at INDEX, with EXACT highlighted.
 
 Ignore case and diacritics when determining matches, except for MARKS."
   (with-current-buffer grammaticus--buffer
@@ -84,7 +89,8 @@ Ignore case and diacritics when determining matches, except for MARKS."
            (lemma (grammaticus--next-field))
            (canon (grammaticus--to-UCS (grammaticus--next-field)))
            (hit (string= exact (downcase (grammaticus--to-ASCII canon marks)))))
-      (format "%s:%s (%s)" (propertize canon 'face (if hit 'bold)) tag lemma))))
+      (cons hit (format "%s:%s (%s)" (propertize canon 'face (if hit 'bold))
+                        tag lemma)))))
 
 (defun grammaticus--next-field ()
   "Return the field at point and proceed to the next."
