@@ -80,29 +80,31 @@
 (defun grammaticus--get (word)
   "Return list of pairs with information pertaining to WORD."
   (setq word (ucs-normalize-NFKD-string (downcase (or word ""))))
-  (let ((all (list (replace-regexp-in-string "\\(qu\\|[nuv]\\)e\\'" "" word))))
-    (unless (string= (car all) word) (push word all))  ; with -que/-ne/-ve
-    (mapcan (lambda (s)
-              (mapcar (apply-partially #'grammaticus--at s '(772))
-                      (gethash (grammaticus--to-ASCII s) grammaticus--index)))
-            all)))
+  (let* ((to (string-match "\\(qu\\|[nuv]\\)e\\'" word))
+         (split (cons (substring word 0 to) (if to (substring word to) ""))))
+    (mapcan (lambda (p)
+              (mapcar (apply-partially #'grammaticus--at (car p) (cdr p) '(772))
+                      (gethash (grammaticus--to-ASCII (car p))
+                               grammaticus--index)))
+            (if to (list (cons word "") split) (list split)))))
 
 (defun grammaticus--show (result)
   "Display the list of pairs returned from grammaticus--get."
   (let ((message-log-max)) (message "%s" (mapconcat #'cdr result "\n"))))
 
-(defun grammaticus--at (exact marks index)
+(defun grammaticus--at (exact enclitic marks index)
   "Return pair with information at INDEX, with EXACT highlighted.
 
-Ignore case and diacritics when determining matches, except for MARKS."
+Ignore case and diacritics when determining matches, except for MARKS.
+Include ENCLITIC in result."
   (with-current-buffer grammaticus--buffer
     (goto-char index)
     (let* ((tag (grammaticus--interpret-tag (grammaticus--next-field)))
            (lemma (grammaticus--next-field))
            (canon (grammaticus--to-UCS (grammaticus--next-field)))
            (hit (string= exact (downcase (grammaticus--to-ASCII canon marks)))))
-      (cons hit (format "%s:%s (%s)" (propertize canon 'face (if hit 'bold))
-                        tag lemma)))))
+      (cons hit (format "%s%s:%s (%s)" (propertize canon 'face (if hit 'bold))
+                        (propertize enclitic 'face 'shadow) tag lemma)))))
 
 (defun grammaticus--next-field ()
   "Return the field at point and proceed to the next."
