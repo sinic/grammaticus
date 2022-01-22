@@ -45,10 +45,10 @@
 (defun grammaticus--check ()
   "Check word at point and underline it if it's unknown."
   (let ((result (grammaticus--get grammaticus--db (thing-at-point 'word t))))
-    (when-let* ((bounds (bounds-of-thing-at-point 'word)))
-      (remove-overlays (car bounds) (cdr bounds) 'grammaticus-overlay t)
-      (unless (seq-some #'car result)
-        (let ((overlay (make-overlay (car bounds) (cdr bounds) nil t))
+    (when-let* ((at (bounds-of-thing-at-point 'word)))
+      (remove-overlays (car at) (cdr at) 'grammaticus-overlay t)
+      (when (seq-every-p #'car result)
+        (let ((overlay (make-overlay (car at) (cdr at) nil t))
               (color (if result "DarkOrange" "Red1")))  ; like in Flyspell
           (overlay-put overlay 'face `(:underline (:style wave :color ,color)))
           (overlay-put overlay 'grammaticus-overlay t)))
@@ -103,8 +103,9 @@ Ignore case/diacritics when determining near matches, except for MARKS."
            (lemma (grammaticus--next-field))
            (canon (grammaticus--to-UCS (grammaticus--next-field)))
            (hit (string= exact (downcase (grammaticus--to-ASCII canon marks)))))
-      (cons hit (format "%s%s:%s (%s)" (propertize canon 'face (if hit 'bold))
-                        (propertize enclitic 'face 'shadow) tag lemma)))))
+      (cons (unless hit (concat canon enclitic))
+            (format "%s%s:%s (%s)" (propertize canon 'face (if hit 'bold))
+                    (propertize enclitic 'face 'shadow) tag lemma)))))
 
 (defun grammaticus--next-field ()
   "Return the field at point and proceed to the next."
