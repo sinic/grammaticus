@@ -26,10 +26,9 @@
 ;; latin-macronizer by Johan Winge.
 
 ;;; Code:
-(defconst grammaticus--buffer (generate-new-buffer " *Grammaticus DB*")
-  "Buffer that will contains the database of words.")
-(defvar grammaticus--index (make-hash-table :test #'equal :size 282939)
-  "Hash table that will map from words to file positions.")
+(defvar grammaticus--db (cons (generate-new-buffer " *Grammaticus DB*")
+                              (make-hash-table :test #'equal :size 282939))
+  "Database the known words will be loaded to.")
 
 (defcustom grammaticus-use-J t "If non-nil, use letter J for consonantal Is."
   :type 'boolean)
@@ -45,8 +44,7 @@
 
 (defun grammaticus--check ()
   "Check word at point and underline it if it's unknown."
-  (let ((result (grammaticus--get grammaticus--buffer grammaticus--index
-                                  (thing-at-point 'word t))))
+  (let ((result (grammaticus--get grammaticus--db (thing-at-point 'word t))))
     (when-let* ((bounds (bounds-of-thing-at-point 'word)))
       (remove-overlays (car bounds) (cdr bounds) 'grammaticus-overlay t)
       (unless (seq-some #'car result)
@@ -59,14 +57,14 @@
 (defun grammaticus-lookup (&optional word)
   "Look up grammatical information to a WORD and display it."
   (interactive (list (read-string "Look up word: " (current-word))))
-  (grammaticus--show (grammaticus--get grammaticus--buffer grammaticus--index
+  (grammaticus--show (grammaticus--get grammaticus--db
                                        (or word (current-word)))))
 
 ;;;###autoload
 (defun grammaticus-add-words (path)
   "Add the words from file at PATH to the database."
   (interactive "fAdd new words from file: ")
-  (with-current-buffer grammaticus--buffer
+  (with-current-buffer (car grammaticus--db)
     (message "Adding new words from %s to the database..."
              (progn (goto-char (point-max))
                     (car (insert-file-contents-literally path))))
@@ -75,19 +73,19 @@
     ;; the buffer around. Only parse the remaining fields at lookup-time.
     (while (not (eobp)) (let ((key (grammaticus--next-field)))
                           (unless (eq (aref key 0) ?#)  ; comment
-                            (push (point) (gethash key grammaticus--index)))
+                            (push (point) (gethash key (cdr grammaticus--db))))
                           (forward-line))))
-  (message "Database now has %d words" (hash-table-size grammaticus--index)))
+  (message "Database now has %d words" (hash-table-size (cdr grammaticus--db))))
 
-(defun grammaticus--get (buffer index word)
+(defun grammaticus--get (db word)
   "Return list of pairs with information pertaining to WORD."
   (setq word (ucs-normalize-NFKD-string (downcase (or word ""))))
   (let* ((to (string-match "\\(qu\\|[nuv]\\)e\\'" word))
          (split (cons (substring word 0 to) (when to (substring word to)))))
     (mapcan (lambda (p)
               (mapcar (apply-partially #'grammaticus--at
-                                       (car p) (or (cdr p) "") '(772) buffer)
-                      (gethash (grammaticus--to-ASCII (car p)) index)))
+                                       (car p) (or (cdr p) "") '(772) (car db))
+                      (gethash (grammaticus--to-ASCII (car p)) (cdr db))))
             (if to (list (list word) split) (list split)))))
 
 (defun grammaticus--show (result)
