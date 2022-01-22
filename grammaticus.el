@@ -45,7 +45,8 @@
 
 (defun grammaticus--check ()
   "Check word at point and underline it if it's unknown."
-  (let ((result (grammaticus--get (thing-at-point 'word t))))
+  (let ((result (grammaticus--get grammaticus--buffer grammaticus--index
+                                  (thing-at-point 'word t))))
     (when-let* ((bounds (bounds-of-thing-at-point 'word)))
       (remove-overlays (car bounds) (cdr bounds) 'grammaticus-overlay t)
       (unless (seq-some #'car result)
@@ -58,7 +59,8 @@
 (defun grammaticus-lookup (&optional word)
   "Look up grammatical information to a WORD and display it."
   (interactive (list (read-string "Look up word: " (current-word))))
-  (grammaticus--show (grammaticus--get (or word (current-word)))))
+  (grammaticus--show (grammaticus--get grammaticus--buffer grammaticus--index
+                                       (or word (current-word)))))
 
 ;;;###autoload
 (defun grammaticus-add-words (path)
@@ -77,27 +79,27 @@
                           (forward-line))))
   (message "Database now has %d words" (hash-table-size grammaticus--index)))
 
-(defun grammaticus--get (word)
+(defun grammaticus--get (buffer index word)
   "Return list of pairs with information pertaining to WORD."
   (setq word (ucs-normalize-NFKD-string (downcase (or word ""))))
   (let* ((to (string-match "\\(qu\\|[nuv]\\)e\\'" word))
-         (split (cons (substring word 0 to) (if to (substring word to) ""))))
+         (split (cons (substring word 0 to) (when to (substring word to)))))
     (mapcan (lambda (p)
-              (mapcar (apply-partially #'grammaticus--at (car p) (cdr p) '(772))
-                      (gethash (grammaticus--to-ASCII (car p))
-                               grammaticus--index)))
-            (if to (list (cons word "") split) (list split)))))
+              (mapcar (apply-partially #'grammaticus--at
+                                       (car p) (or (cdr p) "") '(772) buffer)
+                      (gethash (grammaticus--to-ASCII (car p)) index)))
+            (if to (list (list word) split) (list split)))))
 
 (defun grammaticus--show (result)
   "Display the list of pairs returned from grammaticus--get."
   (let ((message-log-max)) (message "%s" (mapconcat #'cdr result "\n"))))
 
-(defun grammaticus--at (exact enclitic marks index)
-  "Return pair with information at INDEX, with EXACT highlighted.
+(defun grammaticus--at (exact enclitic marks buffer index)
+  "Return pair with information in BUFFER at INDEX
 
-Ignore case and diacritics when determining matches, except for MARKS.
-Include ENCLITIC in result."
-  (with-current-buffer grammaticus--buffer
+Entries that exactly match EXACT are highlighted, ENCLITIC is shadowed.
+Ignore case/diacritics when determining near matches, except for MARKS."
+  (with-current-buffer buffer
     (goto-char index)
     (let* ((tag (grammaticus--interpret-tag (grammaticus--next-field)))
            (lemma (grammaticus--next-field))
