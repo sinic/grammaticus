@@ -60,6 +60,15 @@
   (grammaticus--show (grammaticus--get grammaticus--db
                                        (or word (current-word)))))
 
+(defun grammaticus-correct ()
+  "Replace word at point by first near match."
+  (interactive)
+  (when-let* ((word (thing-at-point 'word t))
+              (at (bounds-of-thing-at-point 'word))
+              (by (seq-some #'car (grammaticus--get grammaticus--db word))))
+    (delete-region (car at) (cdr at))
+    (insert (ucs-normalize-NFC-string (grammaticus--to-ASCII by '(772))))))
+
 ;;;###autoload
 (defun grammaticus-add-words (path)
   "Add the words from file at PATH to the database."
