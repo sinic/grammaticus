@@ -35,9 +35,15 @@
 (defcustom grammaticus-use-V t "If non-nil, use letter V for consonantal Us."
   :type 'boolean)
 
+(defvar grammaticus-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [?\C-.] #'grammaticus-correct)
+    map)
+  "Minor mode keymap for Grammaticus mode.")
+
 (define-minor-mode grammaticus-mode
   "Automatically look up information for the Latin word at point."
-  :lighter " Grammaticus"
+  :lighter " Grammaticus" :keymap grammaticus-mode-map
   (if grammaticus-mode
       (add-hook 'post-command-hook #'grammaticus-lookup t t)
     (remove-hook 'post-command-hook #'grammaticus-lookup t)))
