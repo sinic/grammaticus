@@ -55,13 +55,14 @@
                                        (or word (current-word)))))
 
 (defun grammaticus-correct ()
-  "Replace word at point by first near match."
+  "Replace word at point by next near match."
   (interactive)
   (when-let* ((word (thing-at-point 'word t))
               (at (bounds-of-thing-at-point 'word))
-              (by (seq-some #'car (grammaticus--get grammaticus--db word))))
+              (all (mapcar #'car (grammaticus--get grammaticus--db word)))
+              (by (or (cadr (memq nil (delete-dups all))) (car all))))
     (delete-region (car at) (cdr at))
-    (insert (ucs-normalize-NFC-string (grammaticus--to-ASCII by '(772))))))
+    (insert (ucs-normalize-NFC-string by))))
 
 ;;;###autoload
 (defun grammaticus-add-words (path)
