@@ -59,9 +59,9 @@
 (defun grammaticus-correct ()
   "Replace word at point by next near match."
   (interactive)
-  (when-let* ((word (thing-at-point 'word t))
-              (at (bounds-of-thing-at-point 'word))
-              (all (mapcar #'car (grammaticus--get grammaticus--db word)))
+  (when-let* ((at (bounds-of-thing-at-point 'word))
+              (all (mapcar #'car (grammaticus--get grammaticus--db
+                                                   (word-at-point t))))
               (by (or (cadr (memq nil (delete-dups all))) (car all))))
     (delete-region (car at) (cdr at))
     (insert (ucs-normalize-NFC-string by))))
@@ -85,7 +85,7 @@
 
 (defun grammaticus--highlight ()
   "Check word at point and underline it if it's unknown."
-  (let ((result (grammaticus--get grammaticus--db (thing-at-point 'word t))))
+  (let ((result (grammaticus--get grammaticus--db (word-at-point t))))
     (when-let* ((at (bounds-of-thing-at-point 'word)))
       (remove-overlays (car at) (cdr at) 'grammaticus-overlay t)
       (when (seq-every-p #'car result)
