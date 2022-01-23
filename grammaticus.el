@@ -34,7 +34,7 @@
   :type 'boolean)
 (defcustom grammaticus-use-V t "If non-nil, use letter V for consonantal Us."
   :type 'boolean)
-(defcustom grammaticus-diacritics '(772) "Set of diacritics."
+(defcustom grammaticus-diacritics '(?\N{COMBINING MACRON}) "Set of diacritics."
   :type 'list)
 
 (defvar grammaticus-mode-map
@@ -159,11 +159,12 @@ Ignore case/diacritics when determining near matches, except for MARKS."
 
 (defun grammaticus--to-UCS (string)
   "Replace ASCII punctuation in STRING by UCS diacritics."
-  (dolist (pair `((?_ . 772) (?^ . 774) (?+ . 776)
-                  ,@(unless grammaticus-use-J '((?J . ?I) (?j . ?i)))
-                  ,@(unless grammaticus-use-V '((?V . ?u) (?v . ?u)))))
+  (dolist (pair `(,@(unless grammaticus-use-J '((?J . ?I) (?j . ?i)))
+                  ,@(unless grammaticus-use-V '((?V . ?u) (?v . ?u)))
+                  (?_ . ?\N{COMBINING MACRON}) (?^ . ?\N{COMBINING BREVE})
+                  (?+ . ?\N{COMBINING DIAERESIS})))
     (subst-char-in-string (car pair) (cdr pair) string t))
-  (let ((hidden (string 772 774)))  ; hidden quantity (_^)
+  (let ((hidden "\N{COMBINING MACRON}\N{COMBINING BREVE}"))  ; hidden quantity
     (ucs-normalize-NFKD-string (replace-regexp-in-string hidden "" string))))
 
 (provide 'grammaticus)
