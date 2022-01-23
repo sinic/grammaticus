@@ -117,9 +117,10 @@ Ignore case/diacritics when determining near matches, except for MARKS."
     (let* ((tag (grammaticus--interpret-tag (grammaticus--next-field)))
            (lemma (grammaticus--next-field))
            (canon (grammaticus--to-UCS (grammaticus--next-field)))
-           (hit (string= exact (downcase (grammaticus--to-ASCII canon marks)))))
-      (cons (unless hit (concat canon enclitic))
-            (format "%s%s:%s (%s)" (propertize canon 'face (if hit 'bold))
+           (expect (downcase (grammaticus--to-ASCII canon marks)))
+           (match (equal expect exact)))
+      (cons (unless match (concat expect enclitic))
+            (format "%s%s:%s (%s)" (propertize canon 'face (when match 'bold))
                     (propertize enclitic 'face 'shadow) tag lemma)))))
 
 (defun grammaticus--next-field ()
