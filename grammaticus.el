@@ -34,6 +34,8 @@
   :type 'boolean)
 (defcustom grammaticus-use-V t "If non-nil, use letter V for consonantal Us."
   :type 'boolean)
+(defcustom grammaticus-diacritics '(772) "Set of diacritics."
+  :type 'list)
 
 (defvar grammaticus-mode-map
   (let ((map (make-sparse-keymap)))
@@ -99,8 +101,8 @@
   (let* ((to (string-match "\\(qu\\|[nuv]\\)e\\'" word))
          (split (cons (substring word 0 to) (when to (substring word to)))))
     (mapcan (lambda (p)
-              (mapcar (apply-partially #'grammaticus--at
-                                       (car p) (or (cdr p) "") '(772) (car db))
+              (mapcar (apply-partially #'grammaticus--at (car p) (or (cdr p) "")
+                                       grammaticus-diacritics (car db))
                       (gethash (grammaticus--to-ASCII (car p)) (cdr db))))
             (if to (list (list word) split) (list split)))))
 
