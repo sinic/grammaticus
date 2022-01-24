@@ -56,15 +56,18 @@
   (grammaticus--show (grammaticus--get grammaticus--db
                                        (or word (current-word)))))
 
-(defun grammaticus-correct ()
-  "Replace word at point by next near match."
-  (interactive)
-  (when-let* ((at (bounds-of-thing-at-point 'word))
-              (all (mapcar #'car (grammaticus--get grammaticus--db
-                                                   (word-at-point t))))
-              (by (or (cadr (memq nil (delete-dups all))) (car all))))
-    (delete-region (car at) (cdr at))
-    (insert (ucs-normalize-NFC-string by))))
+(defun grammaticus-correct (point)
+  "Replace last word before point by next near match."
+  (interactive "d")
+  (unwind-protect
+      (when-let* ((at (progn (if (looking-at "\\W") (re-search-backward "\\w"))
+                             (bounds-of-thing-at-point 'word)))
+                  (all (mapcar #'car (grammaticus--get grammaticus--db
+                                                       (word-at-point t))))
+                  (by (or (cadr (memq nil (delete-dups all))) (car all))))
+        (delete-region (car at) (cdr at))
+        (insert (ucs-normalize-NFC-string by)))
+    (goto-char point)))
 
 ;;;###autoload
 (defun grammaticus-add-words (path)
