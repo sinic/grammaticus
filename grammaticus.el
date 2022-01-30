@@ -86,7 +86,15 @@
                           (forward-line))))
   (message "Database now has %d words" (hash-table-size (cdr grammaticus--db))))
 
-(defun grammaticus--highlight ()
+(defun grammaticus--highlight (begin end &rest rest)
+  (save-excursion
+    (remove-overlays (goto-char begin) end 'grammaticus-overlay t)
+    (while (< (point) end)
+      (grammaticus--highlight-at-point)
+      (forward-word))
+    (grammaticus--highlight-at-point)))
+
+(defun grammaticus--highlight-at-point ()
   "Check word at point and underline it if it's unknown."
   (let ((result (grammaticus--get grammaticus--db (word-at-point t))))
     (when-let* ((at (bounds-of-thing-at-point 'word)))
