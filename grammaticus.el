@@ -103,8 +103,7 @@
         (let ((overlay (make-overlay (car at) (cdr at) nil t))
               (color (if result "DarkOrange" "Red1")))  ; like in Flyspell
           (overlay-put overlay 'face `(:underline (:style wave :color ,color)))
-          (overlay-put overlay 'grammaticus-overlay t)))
-      (grammaticus--show result))))
+          (overlay-put overlay 'grammaticus-overlay t))))))
 
 (defun grammaticus--get (db word)
   "Return list of pairs with information pertaining to WORD."
