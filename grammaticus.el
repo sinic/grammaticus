@@ -58,7 +58,7 @@
 
 (defun grammaticus-correct (point)
   "Replace last word before point by next near match."
-  (interactive "d")
+  (interactive "*d")
   (unwind-protect
       (when-let* ((at (progn (or (looking-at "\\w") (re-search-backward "\\w"))
                              (bounds-of-thing-at-point 'word)))
