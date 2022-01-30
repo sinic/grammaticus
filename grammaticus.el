@@ -60,7 +60,7 @@
   "Replace last word before point by next near match."
   (interactive "d")
   (unwind-protect
-      (when-let* ((at (progn (if (looking-at "\\W") (re-search-backward "\\w"))
+      (when-let* ((at (progn (or (looking-at "\\w") (re-search-backward "\\w"))
                              (bounds-of-thing-at-point 'word)))
                   (all (mapcar #'car (grammaticus--get grammaticus--db
                                                        (word-at-point t))))
