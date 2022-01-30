@@ -118,7 +118,8 @@
 
 (defun grammaticus--show (result)
   "Display the list of pairs returned from grammaticus--get."
-  (let ((message-log-max)) (message "%s" (mapconcat #'cdr result "\n"))))
+  (unless isearch-mode
+    (let ((message-log-max)) (message "%s" (mapconcat #'cdr result "\n")))))
 
 (defun grammaticus--at (exact enclitic marks buffer index)
   "Return pair with information in BUFFER at INDEX
