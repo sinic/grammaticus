@@ -53,8 +53,10 @@
 (defun grammaticus-lookup (&optional word)
   "Look up grammatical information to a WORD and display it."
   (interactive (list (read-string "Look up word: " (current-word))))
-  (grammaticus--show (grammaticus--get grammaticus--db
-                                       (or word (current-word)))))
+  (unless isearch-mode
+    (let ((result (grammaticus--get grammaticus--db (or word (current-word))))
+          message-log-max)
+      (message "%s" (mapconcat #'cdr result "\n")))))
 
 (defun grammaticus-correct (point)
   "Replace last word before point by next near match."
@@ -115,11 +117,6 @@
                                        grammaticus-diacritics (car db))
                       (gethash (grammaticus--to-ASCII (car p)) (cdr db))))
             (if to (list (list word) split) (list split)))))
-
-(defun grammaticus--show (result)
-  "Display the list of pairs returned from grammaticus--get."
-  (unless isearch-mode
-    (let ((message-log-max)) (message "%s" (mapconcat #'cdr result "\n")))))
 
 (defun grammaticus--at (exact enclitic marks buffer index)
   "Return pair with information in BUFFER at INDEX
