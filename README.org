@@ -27,6 +27,10 @@ There are two ways to use this package:
 Either explicitly look up words with ~grammaticus-lookup~,
 or simply activate ~grammaticus-mode~,
 which automatically looks up the word at point.
+This mode also provides a key binding
+(@@html:<kbd>@@C-.@@html:</kbd>@@ by default)
+for ~grammaticus-correct~,
+to cycle through the suggestions for the word at or before point.
 
 Note that if you want to
 explicitly look up words at point by pressing a key,
