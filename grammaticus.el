@@ -4,7 +4,7 @@
 ;; Author: Simon Nicolussi <sinic@sinic.name>
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "26.1"))
-;; Keywords: text
+;; Keywords: wp
 ;; Homepage: https://github.com/sinic/grammaticus
 
 ;; This program is free software: you can redistribute it and/or modify
