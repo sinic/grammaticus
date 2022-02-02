@@ -89,10 +89,8 @@
                           (forward-line))))
   (message "Database now has %d words" (hash-table-size (cdr grammaticus--db))))
 
-(defun grammaticus--highlight (begin end &rest rest)
-  "Highlight unknown words between BEGIN and END.
-
-REST is ignored."
+(defun grammaticus--highlight (begin end &rest _rest)
+  "Highlight unknown words between BEGIN and END."
   (save-excursion
     (remove-overlays (goto-char begin) end 'grammaticus-overlay t)
     (while (< (point) end)
