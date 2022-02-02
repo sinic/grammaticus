@@ -4,7 +4,7 @@
 ;; Author: Simon Nicolussi <sinic@sinic.name>
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "26.1"))
-;; Keywords: wp
+;; Keywords: text
 ;; Homepage: https://github.com/sinic/grammaticus
 
 ;; This program is free software: you can redistribute it and/or modify
@@ -30,6 +30,7 @@
                               (make-hash-table :test #'equal :size 282939))
   "Database the known words will be loaded to.")
 
+(defgroup grammaticus () "Latin grammar helper." :group 'text)
 (defcustom grammaticus-use-J t "If non-nil, use letter J for consonantal Is."
   :type 'boolean)
 (defcustom grammaticus-use-V t "If non-nil, use letter V for consonantal Us."
