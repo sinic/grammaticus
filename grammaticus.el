@@ -60,7 +60,7 @@
       (message "%s" (mapconcat #'cdr result "\n")))))
 
 (defun grammaticus-correct (point)
-  "Replace last word before point by next near match."
+  "Replace last word before POINT by next near match."
   (interactive "*d")
   (unwind-protect
       (when-let* ((at (progn (or (looking-at "\\w") (re-search-backward "\\w"))
@@ -90,6 +90,9 @@
   (message "Database now has %d words" (hash-table-size (cdr grammaticus--db))))
 
 (defun grammaticus--highlight (begin end &rest rest)
+  "Highlight unknown words between BEGIN and END.
+
+REST is ignored."
   (save-excursion
     (remove-overlays (goto-char begin) end 'grammaticus-overlay t)
     (while (< (point) end)
@@ -109,7 +112,7 @@
           (overlay-put overlay 'grammaticus-overlay t))))))
 
 (defun grammaticus--get (db word)
-  "Return list of pairs with information pertaining to WORD."
+  "Return list of pairs with information pertaining to WORD from DB."
   (setq word (ucs-normalize-NFKD-string (downcase (or word ""))))
   (let* ((to (string-match "\\(qu\\|[nuv]\\)e\\'" word))
          (split (cons (substring word 0 to) (when to (substring word to)))))
@@ -120,7 +123,7 @@
             (if to (list (list word) split) (list split)))))
 
 (defun grammaticus--at (exact enclitic marks buffer index)
-  "Return pair with information in BUFFER at INDEX
+  "Return pair with information in BUFFER at INDEX.
 
 Entries that exactly match EXACT are highlighted, ENCLITIC is shadowed.
 Ignore case/diacritics when determining near matches, except for MARKS."
