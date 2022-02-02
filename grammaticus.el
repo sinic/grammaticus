@@ -155,7 +155,7 @@ Ignore case/diacritics when determining near matches, except for MARKS."
             (?n . " infinitive") (?p . " participle") (?d . " gerund")
             (?g . " gerundive") (?s . " supine"))
            ((?a . " active") (?p . " passive"))
-           ((?m . " male") (?f . " female") (?n . " neuter"))
+           ((?m . " masculine") (?f . " feminine") (?n . " neuter"))
            ((?n . " nominative") (?v . " vocative") (?a . " accusative")
             (?g . " genitive") (?d . " dative") (?b . " ablative")
             (?l . " locative"))

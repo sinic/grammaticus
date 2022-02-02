@@ -10,7 +10,7 @@ Looking up information about the word '/arās/', for example,
 yields the following in the echo area:
 #+BEGIN_QUOTE
 *ărās*: verb, 2nd person singular present indicative active (aro) \\
-ārās: noun, plural female accusative (ara)
+ārās: noun, plural feminine accusative (ara)
 #+END_QUOTE
 Bold words are considered exact matches, but
 near matches with different vowel lengths are also shown.
