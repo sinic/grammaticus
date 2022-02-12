@@ -30,6 +30,12 @@
                               (make-hash-table :test #'equal :size 282939))
   "Database the known words will be loaded to.")
 
+(defvar grammaticus--syntax-table
+  (let ((table (make-syntax-table text-mode-syntax-table)))
+    (modify-syntax-entry ?' "." table)
+    table)
+  "Syntax table internal to Grammaticus.")
+
 (defgroup grammaticus () "Latin grammar helper." :group 'text)
 (defcustom grammaticus-use-J t "If non-nil, use letter J for consonantal Is."
   :type 'boolean)
@@ -55,21 +61,23 @@
   "Look up grammatical information to a WORD and display it."
   (interactive (list (read-string "Look up word: " (current-word))))
   (unless isearch-mode
-    (let ((result (grammaticus--get grammaticus--db (or word (current-word))))
-          message-log-max)
-      (message "%s" (mapconcat #'cdr result "\n")))))
+    (with-syntax-table grammaticus--syntax-table
+      (let ((result (grammaticus--get grammaticus--db (or word (current-word))))
+            message-log-max)
+        (message "%s" (mapconcat #'cdr result "\n"))))))
 
 (defun grammaticus-correct (point)
   "Replace last word before POINT by next near match."
   (interactive "*d")
-  (unwind-protect
-      (when-let* ((at (progn (or (looking-at "\\w") (re-search-backward "\\w"))
-                             (bounds-of-thing-at-point 'word)))
-                  (all (mapcar #'car (grammaticus--get grammaticus--db
-                                                       (word-at-point t))))
-                  (by (or (cadr (memq nil (delete-dups all))) (car all))))
-        (delete-region (car at) (cdr at))
-        (insert (ucs-normalize-NFC-string by)))
+  (with-syntax-table grammaticus--syntax-table
+    (when-let* ((at (progn (or (= (char-syntax (char-after)) ?w)
+                               (skip-syntax-backward "^w"))
+                           (bounds-of-thing-at-point 'word)))
+                (all (mapcar #'car (grammaticus--get grammaticus--db
+                                                     (word-at-point t))))
+                (by (or (cadr (memq nil (delete-dups all))) (car all))))
+      (delete-region (car at) (cdr at))
+      (insert (ucs-normalize-NFC-string by)))
     (goto-char point)))
 
 ;;;###autoload
@@ -91,12 +99,13 @@
 
 (defun grammaticus--highlight (begin end &rest _rest)
   "Highlight unknown words between BEGIN and END."
-  (save-excursion
-    (remove-overlays (goto-char begin) end 'grammaticus-overlay t)
-    (while (< (point) end)
-      (grammaticus--highlight-at-point)
-      (forward-word))
-    (grammaticus--highlight-at-point)))
+  (with-syntax-table grammaticus--syntax-table
+    (save-excursion
+      (remove-overlays (goto-char begin) end 'grammaticus-overlay t)
+      (while (< (point) end)
+        (grammaticus--highlight-at-point)
+        (forward-word))
+      (grammaticus--highlight-at-point))))
 
 (defun grammaticus--highlight-at-point ()
   "Check word at point and underline it if it's unknown."
