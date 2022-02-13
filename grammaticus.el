@@ -73,11 +73,14 @@
     (when-let* ((at (progn (or (= (char-syntax (char-after)) ?w)
                                (skip-syntax-backward "^w"))
                            (bounds-of-thing-at-point 'word)))
-                (all (mapcar #'car (grammaticus--get grammaticus--db
-                                                     (word-at-point t))))
+                (word (buffer-substring-no-properties (car at) (cdr at)))
+                (case (cond ((string= (upcase word) word) #'upcase)
+                            ((string= (capitalize word) word) #'capitalize)
+                            (t #'identity)))
+                (all (mapcar #'car (grammaticus--get grammaticus--db word)))
                 (by (or (cadr (memq nil (delete-dups all))) (car all))))
       (delete-region (car at) (cdr at))
-      (insert (ucs-normalize-NFC-string by)))
+      (insert (ucs-normalize-NFC-string (funcall case by))))
     (goto-char point)))
 
 ;;;###autoload
