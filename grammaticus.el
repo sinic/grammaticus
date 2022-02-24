@@ -98,7 +98,7 @@
                           (unless (eq (aref key 0) ?#)  ; comment
                             (push (point) (gethash key (cdr grammaticus--db))))
                           (forward-line))))
-  (message "Database now has %d words" (hash-table-size (cdr grammaticus--db))))
+  (message "Database has %d words" (hash-table-count (cdr grammaticus--db))))
 
 (defun grammaticus--highlight (begin end &rest _rest)
   "Highlight unknown words between BEGIN and END."
