@@ -70,7 +70,7 @@
   "Replace last word before POINT by next near match."
   (interactive "*d")
   (with-syntax-table grammaticus--syntax-table
-    (when-let* ((at (progn (or (= (char-syntax (char-after)) ?w)
+    (when-let* ((at (progn (or (= (char-syntax (or (char-after) ? )) ?w)
                                (skip-syntax-backward "^w"))
                            (bounds-of-thing-at-point 'word)))
                 (word (buffer-substring-no-properties (car at) (cdr at)))
