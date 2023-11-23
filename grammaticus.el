@@ -26,6 +26,8 @@
 ;; latin-macronizer by Johan Winge.
 
 ;;; Code:
+(require 'ucs-normalize)
+
 (defvar grammaticus--db (cons (generate-new-buffer " *Grammaticus DB*")
                               (make-hash-table :test #'equal :size 282939))
   "Database the known words will be loaded to.")
