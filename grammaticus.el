@@ -52,6 +52,7 @@
     map)
   "Minor mode keymap for Grammaticus mode.")
 
+;;;###autoload
 (define-minor-mode grammaticus-mode
   "Automatically look up information for the Latin word at point."
   :lighter " Grammaticus" :keymap grammaticus-mode-map
