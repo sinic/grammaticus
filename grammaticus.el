@@ -26,6 +26,9 @@
 ;; latin-macronizer by Johan Winge.
 
 ;;; Code:
+(require 'seq)
+(require 'subr-x)
+(require 'thingatpt)
 (require 'ucs-normalize)
 
 (defvar grammaticus--db (cons (generate-new-buffer " *Grammaticus DB*")
